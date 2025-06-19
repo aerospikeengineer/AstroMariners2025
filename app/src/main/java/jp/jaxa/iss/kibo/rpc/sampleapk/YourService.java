@@ -91,92 +91,96 @@ public class YourService extends KiboRpcService {
     }
 
     private void recognizeImage(int zone) {
-        Mat image = api.getMatNavCam();
+        try {
+            Mat image = api.getMatNavCam();
 
-        Dictionary dictionary = Aruco.getPredefinedDictionary(Aruco.DICT_5X5_250);
-        List<Mat> corners = new ArrayList<>();
-        Mat markerIds = new Mat();
-        Aruco.detectMarkers(image, dictionary, corners, markerIds);
+            Dictionary dictionary = Aruco.getPredefinedDictionary(Aruco.DICT_5X5_250);
+            List<Mat> corners = new ArrayList<>();
+            Mat markerIds = new Mat();
+            Aruco.detectMarkers(image, dictionary, corners, markerIds);
 
-        Mat cameraMatrix = new Mat(3, 3, CvType.CV_64F);
-        cameraMatrix.put(0, 0, api.getNavCamIntrinsics()[0]);
+            Mat cameraMatrix = new Mat(3, 3, CvType.CV_64F);
+            cameraMatrix.put(0, 0, api.getNavCamIntrinsics()[0]);
 
-        Mat cameraCoefficients = new Mat(1, 5, CvType.CV_64F);
-        cameraCoefficients.put(0, 0, api.getNavCamIntrinsics()[1]);
-        cameraCoefficients.convertTo(cameraCoefficients, CvType.CV_64F);
+            Mat cameraCoefficients = new Mat(1, 5, CvType.CV_64F);
+            cameraCoefficients.put(0, 0, api.getNavCamIntrinsics()[1]);
+            cameraCoefficients.convertTo(cameraCoefficients, CvType.CV_64F);
 
-        Mat undistortImg = new Mat();
-        Calib3d.undistort(image, undistortImg, cameraMatrix, cameraCoefficients);
+            Mat undistortImg = new Mat();
+            Calib3d.undistort(image, undistortImg, cameraMatrix, cameraCoefficients);
 
-        // FIX
-        Mat[] templates = new Mat[TEMPLATE_FILE_NAME.length];
-        for (int i = 0; i < TEMPLATE_FILE_NAME.length; i++) {
-            try {
-                InputStream inputStream = getAssets().open(TEMPLATE_FILE_NAME[i]);
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                Mat mat = new Mat();
-                Utils.bitmapToMat(bitmap, mat);
+            // FIX
+            Mat[] templates = new Mat[TEMPLATE_FILE_NAME.length];
+            for (int i = 0; i < TEMPLATE_FILE_NAME.length; i++) {
+                try {
+                    InputStream inputStream = getAssets().open(TEMPLATE_FILE_NAME[i]);
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                    Mat mat = new Mat();
+                    Utils.bitmapToMat(bitmap, mat);
 
-                Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGR2GRAY);
+                    Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGR2GRAY);
 
-                templates[i] = mat;
+                    templates[i] = mat;
 
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }
 
-        int templateMatchCnt[] = new int[10];
+            int templateMatchCnt[] = new int[10];
 
-        for (int tempNum = 0; tempNum < templates.length; tempNum++) {
-            int matchCnt = 0;
+            for (int tempNum = 0; tempNum < templates.length; tempNum++) {
+                int matchCnt = 0;
 
-            List<org.opencv.core.Point> matches = new ArrayList<>();
+                List<org.opencv.core.Point> matches = new ArrayList<>();
 
 
-            Mat template = templates[tempNum].clone();
-            Mat targetImg = undistortImg.clone();
+                Mat template = templates[tempNum].clone();
+                Mat targetImg = undistortImg.clone();
 
-            int widthMin = 20;
-            int widthMax = 100;
-            int changeWidth = 5;
-            int changeAngle = 45;
+                int widthMin = 20;
+                int widthMax = 100;
+                int changeWidth = 5;
+                int changeAngle = 45;
 
-            for (int i = widthMin; i <= widthMax; i += changeWidth) {
-                for (int j = 0; j <= 360; j += changeAngle) {
-                    Mat resizedTemp = resizeImg(template, i);
-                    Mat rotResizedTemp = rotImg(resizedTemp, j);
+                for (int i = widthMin; i <= widthMax; i += changeWidth) {
+                    for (int j = 0; j <= 360; j += changeAngle) {
+                        Mat resizedTemp = resizeImg(template, i);
+                        Mat rotResizedTemp = rotImg(resizedTemp, j);
 
-                    Mat result = new Mat();
-                    Imgproc.matchTemplate(targetImg, rotResizedTemp, result, Imgproc.TM_CCOEFF_NORMED);
+                        Mat result = new Mat();
+                        Imgproc.matchTemplate(targetImg, rotResizedTemp, result, Imgproc.TM_CCOEFF_NORMED);
 
-                    double threshold = 0.8;
-                    Core.MinMaxLocResult mmlr = Core.minMaxLoc(result);
-                    double maxVal = mmlr.maxVal;
+                        double threshold = 0.8;
+                        Core.MinMaxLocResult mmlr = Core.minMaxLoc(result);
+                        double maxVal = mmlr.maxVal;
 
-                    if (maxVal >= threshold) {
-                        Mat thresholdedResult = new Mat();
-                        Imgproc.threshold(result, thresholdedResult, threshold, 1.0, Imgproc.THRESH_TOZERO);
+                        if (maxVal >= threshold) {
+                            Mat thresholdedResult = new Mat();
+                            Imgproc.threshold(result, thresholdedResult, threshold, 1.0, Imgproc.THRESH_TOZERO);
 
-                        for (int y = 0; y < thresholdedResult.rows(); y++) {
-                            for (int x = 0; x < thresholdedResult.cols(); x++) {
-                                if (thresholdedResult.get(y, x)[0] > 0) {
-                                    matches.add(new org.opencv.core.Point(x, y));
+                            for (int y = 0; y < thresholdedResult.rows(); y++) {
+                                for (int x = 0; x < thresholdedResult.cols(); x++) {
+                                    if (thresholdedResult.get(y, x)[0] > 0) {
+                                        matches.add(new org.opencv.core.Point(x, y));
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                List<org.opencv.core.Point> filteredMatches = removeDuplicates(matches);
+                matchCnt = filteredMatches.size();
+
+                templateMatchCnt[tempNum] = matchCnt;
             }
-            List<org.opencv.core.Point> filteredMatches = removeDuplicates(matches);
-            matchCnt = filteredMatches.size();
 
-            templateMatchCnt[tempNum] = matchCnt;
+            int mostMatchTemplateNum = getMaxIndex(templateMatchCnt);
+            api.setAreaInfo(zone, TEMPLATE_NAME[mostMatchTemplateNum], templateMatchCnt[mostMatchTemplateNum]);
+        } catch (Exception e) {
+            Log.e("YourService", "Error recognizing image: " + e.getMessage());
         }
-
-        int mostMatchTemplateNum = getMaxIndex(templateMatchCnt);
-        api.setAreaInfo(zone, TEMPLATE_NAME[mostMatchTemplateNum], templateMatchCnt[mostMatchTemplateNum]);
     }
 
     private final String[] TEMPLATE_FILE_NAME = {
