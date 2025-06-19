@@ -284,9 +284,9 @@ public class YourService extends KiboRpcService {
 
 
         // When you move to the front of the astronaut, report the rounding completion.
-        point = new Point(11.143d, -6.7607d, 4.9654d);
-        quaternion = new Quaternion(0f, 0f, 0.707f, 0.707f);
-        api.moveTo(point, quaternion, false);
+        Point astroPoint = new Point(11.143d, -6.7607d, 4.9654d);
+        Quaternion astroQuaternion = new Quaternion(0f, 0f, 0.707f, 0.707f);
+        api.moveTo(astroPoint, astroQuaternion, false);
         api.reportRoundingCompletion();
 
         /* ********************************************************** */
