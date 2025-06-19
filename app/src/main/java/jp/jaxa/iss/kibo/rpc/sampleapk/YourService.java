@@ -228,37 +228,49 @@ public class YourService extends KiboRpcService {
        // Row 1
         Point point1 = new Point(10.95d, -10.58, 5.195d);
         Quaternion quaternion1 = new Quaternion(0f, 0f, -0.707f, 0.707f);
-        Result res1;
-        do {
-            res1 = api.moveTo(point1, quaternion1, false);
-        } while (!res1.hasSucceeded());
+        Result res1 = api.moveTo(point1, quaternion1, false);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         recognizeImage(1);
 
         // Row 2
         Point point2 = new Point(10.925d, 0.375d, 3.76203d);
         Quaternion quaternion2 = new Quaternion(0f, 0f, -0.707f, 0.707f);
-        Result res2;
-        do {
-            res2 = api.moveTo(point2, quaternion2, false);
-        } while (!res2.hasSucceeded());
+        Result res2 = api.moveTo(point2, quaternion2, false);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         recognizeImage(2);
 
         // Row 3
         Point point3 = new Point(10.925d, -7.925d, 3.76093d);
         Quaternion quaternion3 = new Quaternion(0f, 0f, -0.707f, 0.707f);
-        Result res3;
-        do {
-            res3 = api.moveTo(point3, quaternion3, false);
-        } while (!res3.hasSucceeded());
+        Result res3 = api.moveTo(point3, quaternion3, false);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         recognizeImage(3);
 
         // Row 4
         Point point4 = new Point(9.866984d, -6.8525d, 4.945d);
         Quaternion quaternion4 = new Quaternion(0f, 0f, -0.707f, 0.707f);
-        Result res4;
-        do {
-            res4 = api.moveTo(point4, quaternion4, false);
-        } while (!res4.hasSucceeded());
+        Result res4 = api.moveTo(point4, quaternion4, false);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         recognizeImage(4);
 
         /* **************************************************** */
