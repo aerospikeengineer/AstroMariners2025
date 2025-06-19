@@ -211,26 +211,35 @@ public class YourService extends KiboRpcService {
         api.startMission();
 
         // Move to a point.
-        Point point = new Point(10.9d, -9.92284d, 5.195d);
+        /*Point point = new Point(10.9d, -9.92284d, 5.195d);
         Quaternion quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
         api.moveTo(point, quaternion, false);
-        recognizeImage(1);
+        recognizeImage(1);*/
 
         /* ******************************************************************************** */
         /* Write your code to recognize the type and number of landmark items in each area! */
         /* If there is a treasure item, remember it.                                        */
         /* ******************************************************************************** */
-        point = new Point(10.95d, -10.58, 5.2d);
+       // Row 1
+        point = new Point(10.95d, -10.58, 5.195d);
+        quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
+        api.moveTo(point, quaternion, false);
+        recognizeImage(1);
+
+        // Row 2
+        point = new Point(10.925d, 0.375d, 3.76203d);
         quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
         api.moveTo(point, quaternion, false);
         recognizeImage(2);
 
-        point = new Point(10.9d, -9.92284d, 5.195d);
+        // Row 3
+        point = new Point(10.925d, -7.925d, 3.76093d);
         quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
         api.moveTo(point, quaternion, false);
         recognizeImage(3);
 
-        point = new Point(10.9d, -9.92284d, 5.195d);
+        // Row 4
+        point = new Point(9.866984d, -6.8525d, 4.945d);
         quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
         api.moveTo(point, quaternion, false);
         recognizeImage(4);
