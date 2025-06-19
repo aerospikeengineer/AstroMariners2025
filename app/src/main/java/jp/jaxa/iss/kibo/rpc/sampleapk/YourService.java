@@ -90,49 +90,9 @@ public class YourService extends KiboRpcService {
         return maxIndex;
     }
 
-    private final String[] TEMPLATE_FILE_NAME = {
-        "coin.png",
-        "compass.png",
-        "coral.png",
-        "crystal.png",
-        "emerald.png",
-        "fossil.png",
-        "key.png",
-        "letter.png",
-        "shell.png",
-        "treasure_box.png"
-    };
-    
-    private final String [] TEMPLATE_NAME = {
-            "coin",
-            "compass",
-            "coral",
-            "crystal",
-            "emerald",
-            "fossil",
-            "key",
-            "letter",
-            "shell",
-            "treasure_box"
-    };
-    
-    @Override
-    protected void runPlan1(){
-        // The mission starts.
-        api.startMission();
-
-        // Move to a point.
-        Point point = new Point(10.9d, -9.92284d, 5.195d);
-        Quaternion quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
-        api.moveTo(point, quaternion, false);
-
-        // Get a camera image.
+    private void recognizeImage(int zone) {
         Mat image = api.getMatNavCam();
 
-        /* ******************************************************************************** */
-        /* Write your code to recognize the type and number of landmark items in each area! */
-        /* If there is a treasure item, remember it.                                        */
-        /* ******************************************************************************** */
         Dictionary dictionary = Aruco.getPredefinedDictionary(Aruco.DICT_5X5_250);
         List<Mat> corners = new ArrayList<>();
         Mat markerIds = new Mat();
@@ -147,7 +107,7 @@ public class YourService extends KiboRpcService {
 
         Mat undistortImg = new Mat();
         Calib3d.undistort(image, undistortImg, cameraMatrix, cameraCoefficients);
-        
+
         // FIX
         Mat[] templates = new Mat[TEMPLATE_FILE_NAME.length];
         for (int i = 0; i < TEMPLATE_FILE_NAME.length; i++) {
@@ -216,11 +176,74 @@ public class YourService extends KiboRpcService {
         }
 
         int mostMatchTemplateNum = getMaxIndex(templateMatchCnt);
+        api.setAreaInfo(zone, TEMPLATE_NAME[mostMatchTemplateNum], templateMatchCnt[mostMatchTemplateNum]);
+    }
+
+    private final String[] TEMPLATE_FILE_NAME = {
+        "coin.png",
+        "compass.png",
+        "coral.png",
+        "crystal.png",
+        "emerald.png",
+        "fossil.png",
+        "key.png",
+        "letter.png",
+        "shell.png",
+        "treasure_box.png"
+    };
+    
+    private final String [] TEMPLATE_NAME = {
+            "coin",
+            "compass",
+            "coral",
+            "crystal",
+            "emerald",
+            "fossil",
+            "key",
+            "letter",
+            "shell",
+            "treasure_box"
+    };
+    
+    @Override
+    protected void runPlan1(){
+        // The mission starts.
+        api.startMission();
+
+        // Move to a point.
+        Point point = new Point(10.9d, -9.92284d, 5.195d);
+        Quaternion quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
+        api.moveTo(point, quaternion, false);
+        recognizeImage(1);
+
+        /* ******************************************************************************** */
+        /* Write your code to recognize the type and number of landmark items in each area! */
+        /* If there is a treasure item, remember it.                                        */
+        /* ******************************************************************************** */
+        point = new Point(10.95d, -10.58, 5.2d);
+        quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
+        api.moveTo(point, quaternion, false);
+        recognizeImage(2);
+
+        point = new Point(10.9d, -9.92284d, 5.195d);
+        quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
+        api.moveTo(point, quaternion, false);
+        recognizeImage(3);
+
+        point = new Point(10.9d, -9.92284d, 5.195d);
+        quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
+        api.moveTo(point, quaternion, false);
+        recognizeImage(4);
+
+
+        int mostMatchTemplateNum = getMaxIndex(templateMatchCnt);
         api.setAreaInfo(1, TEMPLATE_NAME[mostMatchTemplateNum], templateMatchCnt[mostMatchTemplateNum]);
 
         /* **************************************************** */
         /* Let's move to each area and recognize the items. */
         /* **************************************************** */
+
+
 
         // When you move to the front of the astronaut, report the rounding completion.
         point = new Point(11.143d, -6.7607d, 4.9654d);
