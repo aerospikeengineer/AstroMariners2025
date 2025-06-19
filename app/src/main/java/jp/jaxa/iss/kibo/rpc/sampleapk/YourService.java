@@ -221,8 +221,8 @@ public class YourService extends KiboRpcService {
         /* If there is a treasure item, remember it.                                        */
         /* ******************************************************************************** */
        // Row 1
-        point = new Point(10.95d, -10.58, 5.195d);
-        quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
+        Point point = new Point(10.95d, -10.58, 5.195d);
+        Quaternion quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
         api.moveTo(point, quaternion, false);
         recognizeImage(1);
 
@@ -243,10 +243,6 @@ public class YourService extends KiboRpcService {
         quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
         api.moveTo(point, quaternion, false);
         recognizeImage(4);
-
-
-        int mostMatchTemplateNum = getMaxIndex(templateMatchCnt);
-        api.setAreaInfo(1, TEMPLATE_NAME[mostMatchTemplateNum], templateMatchCnt[mostMatchTemplateNum]);
 
         /* **************************************************** */
         /* Let's move to each area and recognize the items. */
